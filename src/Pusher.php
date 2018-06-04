@@ -25,6 +25,7 @@ class Pusher implements LoggerAwareInterface
         'timeout'      => 30,
         'debug'        => false,
         'curl_options' => array(),
+        'encryption_key' => ""
     );
 
     /**
@@ -107,9 +108,6 @@ class Pusher implements LoggerAwareInterface
         $this->settings['auth_key'] = $auth_key;
         $this->settings['secret'] = $secret;
         $this->settings['app_id'] = $app_id;
-        if(isset($this->settings['encryption_key'])) {
-            $this->settings['encryption_key'] = $encryption_key;
-        }
         $this->settings['base_path'] = '/apps/'.$this->settings['app_id'];
 
         foreach ($options as $key => $value) {
@@ -455,9 +453,9 @@ class Pusher implements LoggerAwareInterface
     /**
      * Returns a SHA256 hash (encoded as base64) of the channel name appended to the encryption key
      */
-    public static function generate_shared_secret($channel, $encryption_key) 
+    public function generate_shared_secret($channel, $encryption_key) 
     {
-        return base_convert(hash('sha256', $channel . $encryption_key), 16, 64);
+        return hash('sha256', $channel . $encryption_key, true);
     }
     /**
      * Trigger an event by providing event name and payload.
@@ -497,9 +495,13 @@ class Pusher implements LoggerAwareInterface
         }
         $nonce = "";
         if($this->is_encrypted_channel($channels[0])) {
-            $nonce = generateRandomString(32);
-            $shared_secret = generate_shared_secret($channel, $this->settongs['encryption_key']);
-            $data_encoded = sodium_crypto_secretbox($data_encoded, $nonce, $shared_secret);
+            $nonce = $this->generate_nonce();
+            $shared_secret = $this->generate_shared_secret($channels[0], $this->settings['encryption_key']);
+            $cipher_text_b64 = base64_encode(sodium_crypto_secretbox($data_encoded, $nonce, $shared_secret));
+            sodium_memzero($data_encoded);
+            sodium_memzero($shared_secret);
+            $nonce_b64 = base64_encode($nonce);
+            $data_encoded = $this->format_encrypted_message($nonce_b64, $cipher_text_b64);
         }
         $post_params = array();
         $post_params['name'] = $event;
@@ -686,7 +688,7 @@ class Pusher implements LoggerAwareInterface
             $signature['channel_data'] = $custom_data;
         }
         if ($this->is_encrypted_channel($channel)) {
-            $signature['shared_secret'] = generate_shared_secret($channel, $this->settongs['encryption_key']);
+            $signature['shared_secret'] = base64_encode($this->generate_shared_secret($channel, $this->settings['encryption_key']));
         }
         return json_encode($signature);
     }
@@ -761,16 +763,15 @@ class Pusher implements LoggerAwareInterface
 
         return false;
     }
-    public function generateRandomString($length = 10) {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
+    public function generate_nonce() {
+        return random_bytes(
+            SODIUM_CRYPTO_SECRETBOX_NONCEBYTES
+        );
     }
     public function is_encrypted_channel($channel) {
-        return substr( $channel, 0, 9 ) === "encrypted-";
+        return substr( $channel, 0, 18 ) === "private-encrypted-";
+    }
+    public function format_encrypted_message($nonce, $data) {
+        return sprintf("encrypted_data:%s:%s", $nonce, $data);
     }
 }
