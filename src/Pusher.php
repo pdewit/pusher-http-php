@@ -107,6 +107,9 @@ class Pusher implements LoggerAwareInterface
         $this->settings['auth_key'] = $auth_key;
         $this->settings['secret'] = $secret;
         $this->settings['app_id'] = $app_id;
+        if(isset($this->settings['encryption_key'])) {
+            $this->settings['encryption_key'] = $encryption_key;
+        }
         $this->settings['base_path'] = '/apps/'.$this->settings['app_id'];
 
         foreach ($options as $key => $value) {
@@ -450,6 +453,13 @@ class Pusher implements LoggerAwareInterface
     }
 
     /**
+     * Returns a SHA256 hash (encoded as base64) of the channel name appended to the encryption key
+     */
+    public static function generate_shared_secret($channel, $encryption_key) 
+    {
+        return base_convert(hash('sha256', $channel . $encryption_key), 16, 64);
+    }
+    /**
      * Trigger an event by providing event name and payload.
      * Optionally provide a socket ID to exclude a client (most likely the sender).
      *
@@ -485,7 +495,12 @@ class Pusher implements LoggerAwareInterface
                 'error' => print_r($data, true),
             ), LogLevel::ERROR);
         }
-
+        $nonce = "";
+        if($this->is_encrypted_channel($channels[0])) {
+            $nonce = generateRandomString(32);
+            $shared_secret = generate_shared_secret($channel, $this->settongs['encryption_key']);
+            $data_encoded = sodium_crypto_secretbox($data_encoded, $nonce, $shared_secret);
+        }
         $post_params = array();
         $post_params['name'] = $event;
         $post_params['data'] = $data_encoded;
@@ -670,10 +685,11 @@ class Pusher implements LoggerAwareInterface
         if ($custom_data) {
             $signature['channel_data'] = $custom_data;
         }
-
+        if ($this->is_encrypted_channel($channel)) {
+            $signature['shared_secret'] = generate_shared_secret($channel, $this->settongs['encryption_key']);
+        }
         return json_encode($signature);
     }
-
     /**
      * Creates a presence signature (an extension of socket signing).
      *
@@ -744,5 +760,17 @@ class Pusher implements LoggerAwareInterface
         }
 
         return false;
+    }
+    public function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+    public function is_encrypted_channel($channel) {
+        return substr( $channel, 0, 9 ) === "encrypted-";
     }
 }

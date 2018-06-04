@@ -21,13 +21,13 @@ class PusherPushTest extends PHPUnit_Framework_TestCase
 
     public function testStringPush()
     {
-        $string_trigger = $this->pusher->trigger('test_channel', 'my_event', 'Test string');
+        $string_trigger = $this->pusher->trigger('my-channel', 'my_event', 'Test string');
         $this->assertTrue($string_trigger, 'Trigger with string payload');
     }
 
     public function testArrayPush()
     {
-        $structure_trigger = $this->pusher->trigger('test_channel', 'my_event', array('test' => 1));
+        $structure_trigger = $this->pusher->trigger('my-channel', 'my_event', array('test' => 1));
         $this->assertTrue($structure_trigger, 'Trigger with structured payload');
     }
 
@@ -40,7 +40,7 @@ class PusherPushTest extends PHPUnit_Framework_TestCase
         $pusher = new Pusher\Pusher(PUSHERAPP_AUTHKEY, PUSHERAPP_SECRET, PUSHERAPP_APPID, $options);
         $pusher->setLogger(new TestLogger());
 
-        $structure_trigger = $pusher->trigger('test_channel', 'my_event', array('encrypted' => 1));
+        $structure_trigger = $pusher->trigger('my-channel', 'my_event', array('encrypted' => 1));
         $this->assertTrue($structure_trigger, 'Trigger with over encrypted connection');
     }
 
@@ -48,7 +48,7 @@ class PusherPushTest extends PHPUnit_Framework_TestCase
     {
         $data = str_pad('', 11 * 1024, 'a');
         echo  'sending data of size: '.mb_strlen($data, '8bit');
-        $response = $this->pusher->trigger('test_channel', 'my_event', $data, null, true);
+        $response = $this->pusher->trigger('my-channel', 'my_event', $data, null, true);
         $this->assertEquals(413, $response['status'], '413 HTTP status response expected');
     }
 
@@ -68,7 +68,7 @@ class PusherPushTest extends PHPUnit_Framework_TestCase
     public function test_triggering_event_on_multiple_channels()
     {
         $data = array('event_name' => 'event_data');
-        $channels = array('test_channel_1', 'test_channel_2');
+        $channels = array('my-channel_1', 'my-channel_2');
         $response = $this->pusher->trigger($channels, 'my_event', $data);
 
         $this->assertTrue($response);

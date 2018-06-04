@@ -65,7 +65,7 @@ class PusherSocketAuthTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonChannelThrowsException()
     {
-        $this->pusher->socket_auth('test_channel:', '1.1');
+        $this->pusher->socket_auth('my-channel:', '1.1');
     }
 
     /**
@@ -73,7 +73,7 @@ class PusherSocketAuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonChannelThrowsException()
     {
-        $this->pusher->socket_auth(':test_channel', '1.1');
+        $this->pusher->socket_auth(':my-channel', '1.1');
     }
 
     /**
@@ -81,7 +81,7 @@ class PusherSocketAuthTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonNLChannelThrowsException()
     {
-        $this->pusher->socket_auth(':\ntest_channel', '1.1');
+        $this->pusher->socket_auth(':\nmy-channel', '1.1');
     }
 
     /**
@@ -89,6 +89,6 @@ class PusherSocketAuthTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonNLChannelThrowsException()
     {
-        $this->pusher->socket_auth('test_channel\n:', '1.1');
+        $this->pusher->socket_auth('my-channel\n:', '1.1');
     }
 }

@@ -38,7 +38,7 @@ class PusherAuthQueryString extends PHPUnit_Framework_TestCase
         $method = 'POST';
         $auth_key = 'thisisaauthkey';
         $auth_secret = 'thisisasecret';
-        $request_path = '/channels/test_channel/events';
+        $request_path = '/channels/my-channel/events';
         $query_params = array(
             'name' => 'an_event',
         );

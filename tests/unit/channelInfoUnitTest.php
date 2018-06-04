@@ -12,7 +12,7 @@ class PusherChannelInfoUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonChannelThrowsException()
     {
-        $this->pusher->get_channel_info('test_channel:');
+        $this->pusher->get_channel_info('my-channel:');
     }
 
     /**
@@ -20,7 +20,7 @@ class PusherChannelInfoUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonChannelThrowsException()
     {
-        $this->pusher->get_channel_info(':test_channel');
+        $this->pusher->get_channel_info(':my-channel');
     }
 
     /**
@@ -28,7 +28,7 @@ class PusherChannelInfoUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonNLChannelThrowsException()
     {
-        $this->pusher->get_channel_info(':\ntest_channel');
+        $this->pusher->get_channel_info(':\nmy-channel');
     }
 
     /**
@@ -36,6 +36,6 @@ class PusherChannelInfoUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonNLChannelThrowsException()
     {
-        $this->pusher->get_channel_info('test_channel\n:');
+        $this->pusher->get_channel_info('my-channel\n:');
     }
 }

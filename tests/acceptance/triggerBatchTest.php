@@ -22,7 +22,7 @@ class PusherBatchPushTest extends PHPUnit_Framework_TestCase
     public function testSimplePush()
     {
         $batch = array();
-        $batch[] = array('channel' => 'test_channel', 'name' => 'my_event', 'data' => array('my' => 'data'));
+        $batch[] = array('channel' => 'my-channel', 'name' => 'my_event', 'data' => array('my' => 'data'));
         $string_trigger = $this->pusher->triggerBatch($batch);
         $this->assertTrue($string_trigger, 'Trigger with string payload');
     }
@@ -37,7 +37,7 @@ class PusherBatchPushTest extends PHPUnit_Framework_TestCase
         $pusher->setLogger(new TestLogger());
 
         $batch = array();
-        $batch[] = array('channel' => 'test_channel', 'name' => 'my_event', 'data' => array('my' => 'data'));
+        $batch[] = array('channel' => 'my-channel', 'name' => 'my_event', 'data' => array('my' => 'data'));
         $string_trigger = $this->pusher->triggerBatch($batch);
         $this->assertTrue($string_trigger, 'Trigger with string payload');
     }
@@ -46,7 +46,7 @@ class PusherBatchPushTest extends PHPUnit_Framework_TestCase
     {
         $data = str_pad('', 11 * 1024, 'a');
         $batch = array();
-        $batch[] = array('channel' => 'test_channel', 'name' => 'my_event', 'data' => $data);
+        $batch[] = array('channel' => 'my-channel', 'name' => 'my_event', 'data' => $data);
         $response = $this->pusher->triggerBatch($batch, true, true);
         $this->assertContains('content of this event', $response['body']);
         $this->assertEquals(413, $response['status'], '413 HTTP status response expected');
@@ -56,7 +56,7 @@ class PusherBatchPushTest extends PHPUnit_Framework_TestCase
     {
         $batch = array();
         foreach (range(1, 11) as $i) {
-            $batch[] = array('channel' => 'test_channel', 'name' => 'my_event', 'data' => array('index' => $i));
+            $batch[] = array('channel' => 'my-channel', 'name' => 'my_event', 'data' => array('index' => $i));
         }
         $response = $this->pusher->triggerBatch($batch, true, false);
         $this->assertContains('Batch too large', $response['body']);

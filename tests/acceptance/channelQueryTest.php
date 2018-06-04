@@ -24,12 +24,12 @@ class PusherChannelQueryTest extends PHPUnit_Framework_TestCase
 
         // print_r( $channels );
 
-        foreach ($channels as $channel_name => $channel_info) {
+        /*foreach ($channels as $channel_name => $channel_info) {
             echo  "channel_name: $channel_name\n";
             echo  'channel_info: ';
             print_r($channel_info);
             echo  "\n\n";
-        }
+        }*/
 
         $this->assertTrue(is_array($channels), 'channels is an array');
     }
@@ -90,7 +90,7 @@ class PusherChannelQueryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($channels), 'channels have a single test-channel present. For this test to pass you must have the "Getting Started" page open on the dashboard for the app you are testing against');
 
-        $test_channel = $channels['test_channel'];
+        $test_channel = $channels['my-channel'];
 
         $this->assertEquals(0, count($test_channel));
     }
@@ -107,7 +107,7 @@ class PusherChannelQueryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($channels), 'channels have a single test-channel present. For this test to pass you must have the "Getting Started" page open on the dashboard for the app you are testing against');
 
-        $test_channel = $channels['test_channel'];
+        $test_channel = $channels['my-channel'];
 
         $this->assertEquals(0, count($test_channel));
     }

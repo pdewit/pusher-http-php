@@ -14,7 +14,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonChannelThrowsException()
     {
-        $this->pusher->trigger('test_channel:', $this->eventName, $this->data);
+        $this->pusher->trigger('my-channel:', $this->eventName, $this->data);
     }
 
     /**
@@ -22,7 +22,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonChannelThrowsException()
     {
-        $this->pusher->trigger(':test_channel', $this->eventName, $this->data);
+        $this->pusher->trigger(':my-channel', $this->eventName, $this->data);
     }
 
     /**
@@ -30,7 +30,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonNLChannelThrowsException()
     {
-        $this->pusher->trigger(':\ntest_channel', $this->eventName, $this->data);
+        $this->pusher->trigger(':\nmy-channel', $this->eventName, $this->data);
     }
 
     /**
@@ -38,7 +38,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonNLChannelThrowsException()
     {
-        $this->pusher->trigger('test_channel\n:', $this->eventName, $this->data);
+        $this->pusher->trigger('my-channel\n:', $this->eventName, $this->data);
     }
 
     /**
@@ -46,7 +46,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testChannelArrayThrowsException()
     {
-        $this->pusher->trigger(array('this_one_is_okay', 'test_channel\n:'), $this->eventName, $this->data);
+        $this->pusher->trigger(array('this_one_is_okay', 'my-channel\n:'), $this->eventName, $this->data);
     }
 
     /**
@@ -54,7 +54,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel:', $this->eventName, $this->data, '1.1:');
+        $this->pusher->trigger('my-channel:', $this->eventName, $this->data, '1.1:');
     }
 
     /**
@@ -62,7 +62,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel:', $this->eventName, $this->data, ':1.1');
+        $this->pusher->trigger('my-channel:', $this->eventName, $this->data, ':1.1');
     }
 
     /**
@@ -70,7 +70,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testLeadingColonNLSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel:', $this->eventName, $this->data, ':\n1.1');
+        $this->pusher->trigger('my-channel:', $this->eventName, $this->data, ':\n1.1');
     }
 
     /**
@@ -78,13 +78,13 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testTrailingColonNLSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel:', $this->eventName, $this->data, '1.1\n:');
+        $this->pusher->trigger('my-channel:', $this->eventName, $this->data, '1.1\n:');
     }
 
     public function testNullSocketID()
     {
         // Check this does not throw an exception
-        $this->pusher->trigger('test_channel', $this->eventName, $this->data, null);
+        $this->pusher->trigger('my-channel', $this->eventName, $this->data, null);
     }
 
     /**
@@ -92,7 +92,7 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testFalseSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel', $this->eventName, $this->data, false);
+        $this->pusher->trigger('my-channel', $this->eventName, $this->data, false);
     }
 
     /**
@@ -100,6 +100,6 @@ class PusherTriggerUnitTest extends PHPUnit_Framework_TestCase
      */
     public function testEmptyStrSocketIDThrowsException()
     {
-        $this->pusher->trigger('test_channel', $this->eventName, $this->data, '');
+        $this->pusher->trigger('my-channel', $this->eventName, $this->data, '');
     }
 }
