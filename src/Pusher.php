@@ -51,7 +51,7 @@ class Pusher implements LoggerAwareInterface
      *                         cluster - cluster name to connect to.
      *                         notification_host - host to connect to for native notifications.
      *                         notification_scheme - scheme for the notification_host.
-     * @param string $host     [optional] - deprecated
+     * @param string $host     [optional] - deprecatedFweb
      * @param int    $port     [optional] - deprecated
      * @param int    $timeout  [optional] - deprecated
      *
@@ -763,15 +763,61 @@ class Pusher implements LoggerAwareInterface
 
         return false;
     }
+
     public function generate_nonce() {
         return random_bytes(
             SODIUM_CRYPTO_SECRETBOX_NONCEBYTES
         );
     }
+
     public function is_encrypted_channel($channel) {
         return substr( $channel, 0, 18 ) === "private-encrypted-";
     }
+
     public function format_encrypted_message($nonce, $data) {
         return sprintf("encrypted_data:%s:%s", $nonce, $data);
+    }
+
+    public function parse_webhook($headers, $body) {
+        if(!$this->valid_signature($headers, $body)) {
+            return false;
+        }
+        $decoded_events = [];
+        $decoded_json = json_decode($body);
+        foreach($decoded_json->events as $key => $event) {
+            if($this->is_encrypted_channel($event->channel)) {
+                $decryptedEvent = $this->decrypt_event($event);
+                array_push($decoded_events, $decryptedEvent);
+            } else {
+                array_push($decoded_events, $event);
+            }
+        }
+        return $decoded_events;
+    }
+
+    public function decrypt_event($event) {
+        $encrypted_payload = explode(":",$event->data);
+        $nonce = base64_decode($encrypted_payload[1]);
+        $payload = base64_decode($encrypted_payload[2]);
+        $shared_secret = $this->generate_shared_secret($event->channel, $this->settings['encryption_key']);
+        $plaintext = sodium_crypto_secretbox_open($payload, $nonce, $shared_secret);
+        if (empty($plaintext)){
+            return false;
+        }
+        $event->data = $plaintext;
+        return $event;
+    }
+
+    public function valid_signature($headers, $body) {
+        $x_pusher_key = $headers['X-Pusher-Key'];
+        $x_pusher_signature = $headers['X-Pusher-Signature'];
+
+        if(!empty($x_pusher_key)) {
+            if($x_pusher_key == $this->settings['auth_key']) {
+                $expected = hash_hmac('sha256', $body, $this->settings['secret']);
+                return $expected === $x_pusher_signature;
+            }
+        } 
+        return false;
     }
 }
